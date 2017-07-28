@@ -1,0 +1,60 @@
+---
+galaxy_info:
+  author: Andrew Rothstein
+  description: installs supervisord conf for a jupyter notebook
+  company: BlackRock
+  license:
+    - MIT
+  min_ansible_version: 2.0
+  platforms:
+    - name: EL
+      versions:
+        - all
+    - name: Fedora
+      versions:
+        - all
+    - name: Ubuntu
+      versions:
+        - all
+    - name: Alpine
+      versions:
+        - all
+    - name: MacOSX
+      versions:
+        - all
+  galaxy_tags:
+    - python
+    - jupyter
+    - supervisord
+
+dependencies:
+  - role: andrewrothstein.java-openjdk-jre
+    version: v1.0.0
+  - role: fouadsemaan.spark
+    version: v2.0.5
+    spark_mirror_url: '{{jupyter_spark_mirror_url}}'
+    spark_timeout: '{{jupyter_spark_timeout}}'
+    spark_envs:
+      PYTHONPATH : '{{jupyter_spark_python_path}}'
+      SPARK_OPTS : '{{jupyter_spark_opts}}'
+      HADOOP_CONF_DIR : '{{jupyter_spark_hadoop_conf_dir}}'
+      PYSPARK_DRIVER_PYTHON : '{{jupyter_spark_pyspark_driver_python}}'
+      PYTHON : '{{jupyter_spark_python}}}'
+      PYTHONHASHSEED : '{{jupyter_spark_python_hash_seed}}'
+      PYSPARK_PYTHON : '{{jupyter_spark_pyspark_python}}'
+      PYSPARK_DRIVER_PYTHON_OPTS : 'notebook --config={{jupyter_supervisord_profile_py}} --Session.username={{jupyter_supervisord_username}} {% if jupyter_supervisord_notebook_dir is defined %} --NotebookApp.notebook_dir={{jupyter_supervisord_notebook_dir}} {% endif %}'
+  - role: andrewrothstein.jupyter-profile
+    version: v4.0.0
+    jupyter_profile_name: '{{jupyter_supervisord_name}}'
+    jupyter_profile_environment: '{{jupyter_supervisord_environment}}'
+    jupyter_profile_conda_cleanup: '{{jupyter_supervisord_conda_cleanup}}'
+    jupyter_profile_privilege_escalate: '{{jupyter_supervisord_privilege_escalate}}'
+    jupyter_profile_addl_pkgs: '{{jupyter_supervisord_addl_pkgs|default(jupyter_supervisord_dflt_addl_pkgs)}}'
+  - role: fouadsemaan.supervisord-program
+    version: v1.0.4
+    supervisord_program_name: jupyter
+    supervisord_program_command: /usr/local/bin/run-jupyter-notebook.sh
+    supervisord_username: '{{jupyter_supervisord_username}}'
+    supervisord_program_stderr_logfile: '{{jupyter_supervisord_program_stderr_logfile}}'
+    supervisord_program_stdout_logfile: '{{jupyter_supervisord_program_stdout_logfile}}'
+    supervisord_program_redirect_stderr: '{{jupyter_supervisord_program_redirect_stderr}}'

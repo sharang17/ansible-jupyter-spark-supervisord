@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+source activate {{jupyter_supervisord_name}}
+
+{% for env_file in jupyter_supervisord_env_files|default([]) %}
+source {{env_file}}
+{% endfor %}
+
+if [[ -z "${NB_EXECUTABLE}" ]]; then
+  jupyter notebook \
+  	  --config={{jupyter_supervisord_profile_py}} \
+	  --Session.username={{jupyter_supervisord_username}} \
+	  {{jupyter_supervisord_eff_notebook_dir}}
+else
+  jupyter nbconvert \
+          --config={{jupyter_supervisord_profile_py}} \
+          --Session.username={{jupyter_supervisord_username}} \
+          --execute ${NB_FILE} \
+          {{jupyter_supervisord_eff_notebook_dir}}
+fi
